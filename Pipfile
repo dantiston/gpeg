@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 pe = "~=0.5.0"
 gpeg = {file = ".", editable = true}
+pytest = "*"
 
 [dev-packages]
 

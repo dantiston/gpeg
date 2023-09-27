@@ -4,17 +4,24 @@ import argparse
 import sys
 import traceback
 
+from typing import Iterable
+
 import pe
+
+
+def match_yield(expression: str, lines: Iterable[str]) -> Iterable[str]:
+    grammar = pe.compile(expression)
+    for line in lines:
+        if grammar.match(line, flags=pe.MEMOIZE | pe.OPTIMIZE):
+            yield line.strip()
 
 
 def main(args: argparse.Namespace) -> int:
     if args.input is None:
         args.input = sys.stdin.readlines()
     try:
-        grammar = pe.compile(args.expression)
-        for line in args.input:
-            if grammar.match(line, flags=pe.MEMOIZE):
-                print(line.strip())
+        for match in match_yield(args.expression, args.input):
+            print(match)
         return 0
     except Exception as e:
         traceback.print_exception(e)
