@@ -1,8 +1,8 @@
 # gpeg
 Search with Parsing Expressions: global/parsing expressions/print
 
-A utility for searching streams using [pe](https://github.com/goodmami/pe/tree/main)
-style Parsing Expression Grammars (PEGs).
+A utility for searching streams using [pe](https://github.com/goodmami/pe/tree/main)-style
+Parsing Expression Grammars (PEGs).
 
 # Examples
 ```
@@ -18,7 +18,7 @@ $ cat trees.tsv
 (()
 (())
 (()())
-$ gpeg 'top <- '(' top* ')'' <trees.txt # verify parentheses
+$ gpeg "top <- '(' top* ')'" <trees.txt # verify parentheses
 ()
 (())
 (()())
@@ -28,4 +28,11 @@ $ cat mydata.jsonl
 - Neither is this
 $ gpeg json.grm <mydata.jsonl # use more complicated grammars
 ['hello world']
+$ cat home.html
+<html>
+    /* I don't care about comments */
+    <span><a href="github.com">github</a></span>
+</html>
+$ gpeg html_links.grm <home.html # extract links from HTML
+github.com
 ```
