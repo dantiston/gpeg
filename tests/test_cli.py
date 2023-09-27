@@ -2,7 +2,10 @@
 
 import pytest
 
-from src.gpeg.cli import match_yield
+from src.gpeg.cli import match_yield, GpegArgs
+
+
+DEFAULT_ARGS = GpegArgs()
 
 
 @pytest.mark.parametrize(
@@ -70,5 +73,20 @@ from src.gpeg.cli import match_yield
     ],
 )
 def test_expression(expression: str, values: list[str], expected: list[str]) -> None:
-    actual: list[str] = list(match_yield(expression, values))
+    actual: list[str] = list(match_yield(expression, values, DEFAULT_ARGS))
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "expression,values,args,expected",
+    [
+        ("[0-9]", ["1"], GpegArgs(line_number=True), ["1:1"]),
+        ("[0-9]", ["1", "2"], GpegArgs(line_number=True), ["1:1", "2:2"]),
+        ("[0-9]", ["1", "a", "2"], GpegArgs(line_number=True), ["1:1", "3:2"]),
+    ],
+)
+def test_args(
+    expression: str, values: list[str], args: GpegArgs, expected: list[str]
+) -> None:
+    actual: list[str] = list(match_yield(expression, values, args))
     assert actual == expected
