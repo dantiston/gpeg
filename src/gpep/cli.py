@@ -11,28 +11,28 @@ import pe
 
 
 @dataclass
-class GpegArgs:
+class GpepArgs:
     after: int = 0
     before: int = 0
     line_number: bool = False
 
     @classmethod
-    def from_argparse(cls, args: argparse.Namespace) -> "GpegArgs":
-        return GpegArgs(
+    def from_argparse(cls, args: argparse.Namespace) -> "GpepArgs":
+        return GpepArgs(
             after=max(args.after_context or 0, args.context or 0),
             before=max(args.before_context or 0, args.context or 0),
             line_number=args.line_number,
         )
 
 
-def format_match(line: str, n: int, args: GpegArgs, delimiter: str = ":") -> str:
+def format_match(line: str, n: int, args: GpepArgs, delimiter: str = ":") -> str:
     result = line.rstrip()
     if args.line_number:
         result = f"{n}{delimiter}{result}"
     return result
 
 
-def match_yield(expression: str, lines: Iterable[str], args: GpegArgs) -> Iterable[str]:
+def match_yield(expression: str, lines: Iterable[str], args: GpepArgs) -> Iterable[str]:
     buffer: list[str] = []
     grammar = pe.compile(expression)
     after_context_count = 0
@@ -60,7 +60,7 @@ def main(args: argparse.Namespace) -> int:
         args.input = sys.stdin.readlines()
     try:
         for match in match_yield(
-            args.expression, args.input, GpegArgs.from_argparse(args)
+            args.expression, args.input, GpepArgs.from_argparse(args)
         ):
             print(match)
         return 0
@@ -71,7 +71,7 @@ def main(args: argparse.Namespace) -> int:
 
 def main_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        "gpeg",
+        "gpep",
         description="Search with Parsing Expressions: global/parsing expressions/print",
     )
     parser.add_argument("expression", help="The expression to match")
