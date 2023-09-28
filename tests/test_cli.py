@@ -80,9 +80,80 @@ def test_expression(expression: str, values: list[str], expected: list[str]) -> 
 @pytest.mark.parametrize(
     "expression,values,args,expected",
     [
+        # Line number
         ("[0-9]", ["1"], GpegArgs(line_number=True), ["1:1"]),
         ("[0-9]", ["1", "2"], GpegArgs(line_number=True), ["1:1", "2:2"]),
         ("[0-9]", ["1", "a", "2"], GpegArgs(line_number=True), ["1:1", "3:2"]),
+        # Context
+        ("'3'", ["1", "2", "3", "4", "5"], GpegArgs(after=1), ["3", "4"]),
+        ("'3'", ["1", "2", "3", "4", "5"], GpegArgs(after=2), ["3", "4", "5"]),
+        ("'2'", ["1", "2", "3", "4", "5"], GpegArgs(after=2), ["2", "3", "4"]),
+        ("'4'", ["1", "2", "3", "4", "5"], GpegArgs(after=2), ["4", "5"]),
+        ("'3'", ["1", "2", "3", "4", "5"], GpegArgs(before=1), ["2", "3"]),
+        ("'3'", ["1", "2", "3", "4", "5"], GpegArgs(before=2), ["1", "2", "3"]),
+        ("'4'", ["1", "2", "3", "4", "5"], GpegArgs(before=2), ["2", "3", "4"]),
+        ("'2'", ["1", "2", "3", "4", "5"], GpegArgs(before=2), ["1", "2"]),
+        (
+            "'3'",
+            ["1", "2", "3", "4", "5"],
+            GpegArgs(after=1, before=1),
+            ["2", "3", "4"],
+        ),
+        (
+            "'3'",
+            ["1", "2", "3", "4", "5"],
+            GpegArgs(after=2, before=2),
+            ["1", "2", "3", "4", "5"],
+        ),
+        (
+            "'4'",
+            ["1", "2", "3", "4", "5"],
+            GpegArgs(after=2, before=2),
+            ["2", "3", "4", "5"],
+        ),
+        (
+            "'2'",
+            ["1", "2", "3", "4", "5"],
+            GpegArgs(after=2, before=2),
+            ["1", "2", "3", "4"],
+        ),
+        (
+            "'3'",
+            ["1", "2", "3", "4", "5"],
+            GpegArgs(after=2, before=1),
+            ["2", "3", "4", "5"],
+        ),
+        (
+            "'4'",
+            ["1", "2", "3", "4", "5"],
+            GpegArgs(after=2, before=1),
+            ["3", "4", "5"],
+        ),
+        (
+            "'2'",
+            ["1", "2", "3", "4", "5"],
+            GpegArgs(after=2, before=1),
+            ["1", "2", "3", "4"],
+        ),
+        # Line number x context
+        (
+            "'3'",
+            ["1", "2", "3", "4", "5"],
+            GpegArgs(before=1, line_number=True),
+            ["2-2", "3:3"],
+        ),
+        (
+            "'3'",
+            ["1", "2", "3", "4", "5"],
+            GpegArgs(after=1, line_number=True),
+            ["3:3", "4-4"],
+        ),
+        (
+            "'3'",
+            ["1", "2", "3", "4", "5"],
+            GpegArgs(after=1, before=1, line_number=True),
+            ["2-2", "3:3", "4-4"],
+        ),
     ],
 )
 def test_args(
