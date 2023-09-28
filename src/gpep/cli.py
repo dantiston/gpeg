@@ -10,6 +10,10 @@ from dataclasses import dataclass
 import pe
 
 
+CONTEXT_DELIMITER = "-"
+PRIMARY_DELIMITER = ":"
+
+
 @dataclass
 class GpepArgs:
     after: int = 0
@@ -25,7 +29,9 @@ class GpepArgs:
         )
 
 
-def format_match(line: str, n: int, args: GpepArgs, delimiter: str = ":") -> str:
+def format_match(
+    line: str, n: int, args: GpepArgs, delimiter: str = PRIMARY_DELIMITER
+) -> str:
     result = line.rstrip()
     if args.line_number:
         result = f"{n}{delimiter}{result}"
@@ -42,17 +48,19 @@ def match_yield(expression: str, lines: Iterable[str], args: GpepArgs) -> Iterab
         # pe.OPTIMIZE: alter the grammar to improve runtime
         if grammar.match(line, flags=pe.MEMOIZE | pe.OPTIMIZE):
             yield from (
-                format_match(buffer_line, n + i, args, "-")
+                format_match(buffer_line, n + i, args, CONTEXT_DELIMITER)
                 for i, buffer_line in enumerate(buffer, start=-len(buffer))
             )
             yield format_match(line, n, args)
+            buffer = []
             after_context_count = args.after
         elif after_context_count > 0:
             after_context_count -= 1
-            yield format_match(line, n, args, "-")
-        if args.before > 0:
-            buffer.append(line)
-            buffer = buffer[-args.before :]
+            yield format_match(line, n, args, CONTEXT_DELIMITER)
+        else:
+            if args.before > 0:
+                buffer.append(line)
+                buffer = buffer[-args.before :]
 
 
 def main(args: argparse.Namespace) -> int:

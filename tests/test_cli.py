@@ -135,6 +135,25 @@ def test_expression(expression: str, values: list[str], expected: list[str]) -> 
             GpepArgs(after=2, before=1),
             ["1", "2", "3", "4"],
         ),
+        # Overlapping context
+        (
+            "'1' / '2'",
+            ["1", "2", "3", "4", "5"],
+            GpepArgs(after=3),
+            ["1", "2", "3", "4", "5"],
+        ),
+        (
+            "'4' / '5'",
+            ["1", "2", "3", "4", "5"],
+            GpepArgs(before=3),
+            ["1", "2", "3", "4", "5"],
+        ),
+        (
+            "'2' / '4'",
+            ["1", "2", "3", "4", "5"],
+            GpepArgs(before=1, after=1),
+            ["1", "2", "3", "4", "5"],
+        ),
         # Line number x context
         (
             "'3'",
@@ -153,6 +172,12 @@ def test_expression(expression: str, values: list[str], expected: list[str]) -> 
             ["1", "2", "3", "4", "5"],
             GpepArgs(after=1, before=1, line_number=True),
             ["2-2", "3:3", "4-4"],
+        ),
+        (
+            "'4' / '5'",
+            ["1", "2", "3", "4", "5"],
+            GpepArgs(before=3, line_number=True),
+            ["1-1", "2-2", "3-3", "4:4", "5:5"],
         ),
     ],
 )
