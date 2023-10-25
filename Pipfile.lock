@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d20d2de2784df7f03f64e0e1e93573297ffa24943122dcbb9116fdc44eeb5932"
+            "sha256": "13e1a8bdd3a44be43622eed9b6f977b992ee1b9f335d07dbfb1ae671dc8803ed"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,7 +16,7 @@
         ]
     },
     "default": {
-        "gpeg": {
+        "gpep": {
             "editable": true,
             "file": "."
         },

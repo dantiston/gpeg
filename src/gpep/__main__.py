@@ -2,7 +2,7 @@
 
 import sys
 
-from src.gpeg.cli import main, main_parser
+from src.gpep.cli import main, main_parser
 
 if __name__ == "__main__":
     parser = main_parser()

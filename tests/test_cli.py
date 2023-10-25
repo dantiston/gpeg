@@ -2,10 +2,10 @@
 
 import pytest
 
-from src.gpeg.cli import match_yield, GpegArgs
+from src.gpep.cli import match_yield, GpepArgs
 
 
-DEFAULT_ARGS = GpegArgs()
+DEFAULT_ARGS = GpepArgs()
 
 
 @pytest.mark.parametrize(
@@ -81,83 +81,108 @@ def test_expression(expression: str, values: list[str], expected: list[str]) -> 
     "expression,values,args,expected",
     [
         # Line number
-        ("[0-9]", ["1"], GpegArgs(line_number=True), ["1:1"]),
-        ("[0-9]", ["1", "2"], GpegArgs(line_number=True), ["1:1", "2:2"]),
-        ("[0-9]", ["1", "a", "2"], GpegArgs(line_number=True), ["1:1", "3:2"]),
+        ("[0-9]", ["1"], GpepArgs(line_number=True), ["1:1"]),
+        ("[0-9]", ["1", "2"], GpepArgs(line_number=True), ["1:1", "2:2"]),
+        ("[0-9]", ["1", "a", "2"], GpepArgs(line_number=True), ["1:1", "3:2"]),
         # Context
-        ("'3'", ["1", "2", "3", "4", "5"], GpegArgs(after=1), ["3", "4"]),
-        ("'3'", ["1", "2", "3", "4", "5"], GpegArgs(after=2), ["3", "4", "5"]),
-        ("'2'", ["1", "2", "3", "4", "5"], GpegArgs(after=2), ["2", "3", "4"]),
-        ("'4'", ["1", "2", "3", "4", "5"], GpegArgs(after=2), ["4", "5"]),
-        ("'3'", ["1", "2", "3", "4", "5"], GpegArgs(before=1), ["2", "3"]),
-        ("'3'", ["1", "2", "3", "4", "5"], GpegArgs(before=2), ["1", "2", "3"]),
-        ("'4'", ["1", "2", "3", "4", "5"], GpegArgs(before=2), ["2", "3", "4"]),
-        ("'2'", ["1", "2", "3", "4", "5"], GpegArgs(before=2), ["1", "2"]),
+        ("'3'", ["1", "2", "3", "4", "5"], GpepArgs(after=1), ["3", "4"]),
+        ("'3'", ["1", "2", "3", "4", "5"], GpepArgs(after=2), ["3", "4", "5"]),
+        ("'2'", ["1", "2", "3", "4", "5"], GpepArgs(after=2), ["2", "3", "4"]),
+        ("'4'", ["1", "2", "3", "4", "5"], GpepArgs(after=2), ["4", "5"]),
+        ("'3'", ["1", "2", "3", "4", "5"], GpepArgs(before=1), ["2", "3"]),
+        ("'3'", ["1", "2", "3", "4", "5"], GpepArgs(before=2), ["1", "2", "3"]),
+        ("'4'", ["1", "2", "3", "4", "5"], GpepArgs(before=2), ["2", "3", "4"]),
+        ("'2'", ["1", "2", "3", "4", "5"], GpepArgs(before=2), ["1", "2"]),
         (
             "'3'",
             ["1", "2", "3", "4", "5"],
-            GpegArgs(after=1, before=1),
+            GpepArgs(after=1, before=1),
             ["2", "3", "4"],
         ),
         (
             "'3'",
             ["1", "2", "3", "4", "5"],
-            GpegArgs(after=2, before=2),
+            GpepArgs(after=2, before=2),
             ["1", "2", "3", "4", "5"],
         ),
         (
             "'4'",
             ["1", "2", "3", "4", "5"],
-            GpegArgs(after=2, before=2),
+            GpepArgs(after=2, before=2),
             ["2", "3", "4", "5"],
         ),
         (
             "'2'",
             ["1", "2", "3", "4", "5"],
-            GpegArgs(after=2, before=2),
+            GpepArgs(after=2, before=2),
             ["1", "2", "3", "4"],
         ),
         (
             "'3'",
             ["1", "2", "3", "4", "5"],
-            GpegArgs(after=2, before=1),
+            GpepArgs(after=2, before=1),
             ["2", "3", "4", "5"],
         ),
         (
             "'4'",
             ["1", "2", "3", "4", "5"],
-            GpegArgs(after=2, before=1),
+            GpepArgs(after=2, before=1),
             ["3", "4", "5"],
         ),
         (
             "'2'",
             ["1", "2", "3", "4", "5"],
-            GpegArgs(after=2, before=1),
+            GpepArgs(after=2, before=1),
             ["1", "2", "3", "4"],
+        ),
+        # Overlapping context
+        (
+            "'1' / '2'",
+            ["1", "2", "3", "4", "5"],
+            GpepArgs(after=3),
+            ["1", "2", "3", "4", "5"],
+        ),
+        (
+            "'4' / '5'",
+            ["1", "2", "3", "4", "5"],
+            GpepArgs(before=3),
+            ["1", "2", "3", "4", "5"],
+        ),
+        (
+            "'2' / '4'",
+            ["1", "2", "3", "4", "5"],
+            GpepArgs(before=1, after=1),
+            ["1", "2", "3", "4", "5"],
         ),
         # Line number x context
         (
             "'3'",
             ["1", "2", "3", "4", "5"],
-            GpegArgs(before=1, line_number=True),
+            GpepArgs(before=1, line_number=True),
             ["2-2", "3:3"],
         ),
         (
             "'3'",
             ["1", "2", "3", "4", "5"],
-            GpegArgs(after=1, line_number=True),
+            GpepArgs(after=1, line_number=True),
             ["3:3", "4-4"],
         ),
         (
             "'3'",
             ["1", "2", "3", "4", "5"],
-            GpegArgs(after=1, before=1, line_number=True),
+            GpepArgs(after=1, before=1, line_number=True),
             ["2-2", "3:3", "4-4"],
+        ),
+        (
+            "'4' / '5'",
+            ["1", "2", "3", "4", "5"],
+            GpepArgs(before=3, line_number=True),
+            ["1-1", "2-2", "3-3", "4:4", "5:5"],
         ),
     ],
 )
 def test_args(
-    expression: str, values: list[str], args: GpegArgs, expected: list[str]
+    expression: str, values: list[str], args: GpepArgs, expected: list[str]
 ) -> None:
     actual: list[str] = list(match_yield(expression, values, args))
     assert actual == expected
